@@ -16,8 +16,6 @@ RUN dpkg --add-architecture i386 && apt-get update && apt-get install -yq \
     imagemagick \
     jq \
     libc6:i386 \
-    libcurl3 \
-    libcurl3-gnutls \
     libcurl4-openssl-dev \
     libncurses5:i386 \
     librsvg2-bin \
