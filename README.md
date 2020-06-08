@@ -1,6 +1,6 @@
 # Docker image for building React Native Android apps
 
-This Docker image contains all dependencies required to build Android apps
+This Docker image contains all dependencies required to build React Android apps
 based on React Native and ensures that build happens in the clear environment.
 
 
@@ -63,20 +63,8 @@ The .apk file will be located at `/app/android/app/build/outputs/apk/debug/app-d
 
 # Source & Pre-built images on Docker Hub
 
-* https://github.com/SoftwareMansion/react-native-docker-android
 * https://hub.docker.com/r/swmansion/react-native-android
 
-
-# Authors
-
-[Marcin Lewandowski](https://github.com/mspanc)
-
-
 # Copyright and License
-
-Copyright 2018, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=react-native-docker-android)
-
-[![Software Mansion](https://membraneframework.github.io/static/logo/swm_logo_readme.png)](
-https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=react-native-docker-android)
 
 Licensed under the [Apache License, Version 2.0](LICENSE)
