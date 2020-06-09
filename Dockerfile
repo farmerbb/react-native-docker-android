@@ -117,7 +117,7 @@ ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${
 RUN gem install fastlane -v ${FASTLANE_VERSION} -NW \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
   && gem update --system
-RUN gem update bundler
+RUN bundle install
 
 # Remove Build Deps
 RUN apt-get purge -y --auto-remove $buildDeps
