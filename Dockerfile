@@ -1,79 +1,57 @@
-FROM ubuntu
+FROM openjdk:8
 
-LABEL Description="This image provides a base Android development environment for React Native, and may be used to run tests."
+# nodejs, zip, to unzip things
+RUN apt-get update && \
+    apt-get -y install zip expect && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get install -y nodejs
 
-ARG DEBIAN_FRONTEND=noninteractive
-# set default build arguments
-ARG SDK_VERSION=sdk-tools-linux-4333796.zip
-ARG ANDROID_BUILD_VERSION=28
-ARG ANDROID_TOOLS_VERSION=28.0.3
-ARG NDK_VERSION=20.0.5594570
-ARG NODE_VERSION=12.x
-ARG WATCHMAN_VERSION=4.9.0
+# Install 32bit support for Android SDK
+RUN dpkg --add-architecture i386 && \
+    apt-get update -q && \
+    apt-get install -qy --no-install-recommends libstdc++6:i386 libgcc1:i386 zlib1g:i386 libncurses5:i386 && \
+    apt-get install bundle fastlane
 
-# set default environment variables
-ENV ADB_INSTALL_TIMEOUT=100
-ENV ANDROID_HOME=/opt/android
-ENV ANDROID_SDK_HOME=${ANDROID_HOME}
-ENV ANDROID_NDK=${ANDROID_HOME}/ndk/$NDK_VERSION
+# install yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && apt-get install -y yarn
 
-ENV PATH=${ANDROID_NDK}:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools:/opt/buck/bin/:${PATH}
+# gradle
+ENV GRADLE_VERSION 3.3
+ENV GRADLE_SDK_URL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip
+RUN curl -sSL "${GRADLE_SDK_URL}" -o gradle-${GRADLE_VERSION}-bin.zip  \
+    && unzip gradle-${GRADLE_VERSION}-bin.zip -d /usr/local  \
+    && rm -rf gradle-${GRADLE_VERSION}-bin.zip
+ENV GRADLE_HOME /usr/local/gradle-${GRADLE_VERSION}
+ENV PATH ${GRADLE_HOME}/bin:$PATH
 
-# Install system dependencies
-RUN apt update -qq && apt install -qq -y --no-install-recommends \
-        apt-transport-https \
-        curl \
-        build-essential \
-        file \
-        git \
-        openjdk-8-jdk \
-        gnupg2 \
-        python \
-        openssh-client \
-        unzip \
-    && rm -rf /var/lib/apt/lists/*;
+# Setup environment
+ENV ANDROID_HOME /opt/android-sdk-linux
+ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+ARG ANDROID_SDK_VERSION=4333796
 
-# install latest Ruby using ruby-install
-RUN apt-get update -qq \
-  && apt-get install -qq -y --no-install-recommends \
-          bison \
-          zlib1g-dev \
-          libyaml-dev \
-          libssl-dev \
-          libgdbm-dev \
-          libreadline-dev \
-          libncurses5-dev \
-          libffi-dev \
-  && curl -L https://github.com/postmodern/ruby-install/archive/v0.7.0.tar.gz | tar -zxvf - -C /tmp/ \
-  && cd /tmp/ruby-install-* \
-  && make install \
-  && ruby-install --latest --system --cleanup ruby \
-  && gem install fastlane -N \
-  && gem install bundler -N \
-  && rm -rf /var/lib/apt/lists/*
+# android sdk tools
+RUN cd /opt \
+    && wget -q https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_VERSION}.zip -O tools.zip \
+    && mkdir -p ${ANDROID_HOME} \
+    && unzip tools.zip -d ${ANDROID_HOME} \
+    && rm -f tools.zip
 
-# install nodejs and yarn packages from nodesource and yarn apt sources
-RUN echo "deb https://deb.nodesource.com/node_${NODE_VERSION} stretch main" > /etc/apt/sources.list.d/nodesource.list \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
-    && curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && apt-get update -qq \
-    && apt-get install -qq -y --no-install-recommends nodejs yarn \
-    && rm -rf /var/lib/apt/lists/*
-
-# Full reference at https://dl.google.com/android/repository/repository2-1.xml
-# download and unpack android
-RUN curl -sS https://dl.google.com/android/repository/${SDK_VERSION} -o /tmp/sdk.zip \
-    && mkdir ${ANDROID_HOME} \
-    && unzip -q -d ${ANDROID_HOME} /tmp/sdk.zip \
-    && rm /tmp/sdk.zip \
-    && yes | sdkmanager --licenses \
-    && yes | sdkmanager "platform-tools" \
-        "emulator" \
-        "platforms;android-$ANDROID_BUILD_VERSION" \
-        "build-tools;$ANDROID_TOOLS_VERSION" \
-        "add-ons;addon-google_apis-google-23" \
-        "system-images;android-19;google_apis;armeabi-v7a" \
+# sdk
+RUN yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+RUN $ANDROID_HOME/tools/bin/sdkmanager \
+        tools \
+        platform-tools \
+        "build-tools;23.0.1" \
+        "build-tools;23.0.3" \
+        "build-tools;25.0.1" \
+        "build-tools;25.0.2" \
+        "platforms;android-23" \
+        "platforms;android-25" \
         "extras;android;m2repository" \
-        "ndk;$NDK_VERSION" \
-    && rm -rf /opt/android/.android
+        "extras;google;m2repository" \
+        "extras;google;google_play_services" \
+    && $ANDROID_HOME/tools/bin/sdkmanager --update
+
+WORKDIR /root
