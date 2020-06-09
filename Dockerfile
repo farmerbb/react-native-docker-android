@@ -2,6 +2,7 @@ FROM ubuntu
 
 LABEL Description="This image provides a base Android development environment for React Native, and may be used to run tests."
 
+ARG DEBIAN_FRONTEND=noninteractive
 # set default build arguments
 ARG SDK_VERSION=sdk-tools-linux-4333796.zip
 ARG ANDROID_BUILD_VERSION=28
