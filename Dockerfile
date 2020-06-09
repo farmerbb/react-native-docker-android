@@ -26,7 +26,7 @@ ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zi
     ANDROID_VERSION=28 \
     ANDROID_BUILD_TOOLS_VERSION=28.0.3
 
-ENV FASTLANE_VERSION 2.146.1
+ENV FASTLANE_VERSION 2.149.1
 
 # Download Android SDK
 RUN mkdir "$ANDROID_HOME" .android \
@@ -110,12 +110,14 @@ ENV BUNDLE_PATH="$GEM_HOME" \
 RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
   && chmod 777 "$GEM_HOME" "$BUNDLE_BIN"
 
+
 # Path
 ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin
 
-RUN gem install fastlane -v ${FASTLANE_VERSION} \
+RUN gem install fastlane -v ${FASTLANE_VERSION} -NW \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
   && gem update --system
+RUN gem update bundler
 
 # Remove Build Deps
 RUN apt-get purge -y --auto-remove $buildDeps
