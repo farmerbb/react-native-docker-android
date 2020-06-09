@@ -1,13 +1,13 @@
-FROM openjdk:8
+FROM gradle:6.0.1-jdk8
 
 ENV DEBIAN_FRONTEND noninteractive
 
 # Android & Gradle
 ENV GRADLE_URL http://services.gradle.org/distributions/gradle-3.5-all.zip
-ENV GRADLE_HOME /usr/local/gradle-3.5
+ENV GRADLE_HOME /usr/local/gradle-6.0.1
 ENV ANDROID_SDK_URL http://dl.google.com/android/android-sdk_r24.3.5-linux.tgz
 ENV ANDROID_HOME /usr/local/android-sdk-linux
-ENV ANDROID_SDK_COMPONENTS_LATEST platform-tools,build-tools-28.0.3,,android-28,extra-android-support,extra-android-m2repository,extra-google-m2repository
+ENV ANDROID_SDK_COMPONENTS_LATEST platform-tools,build-tools-28.0.3,android-28,extra-android-support,extra-android-m2repository,extra-google-m2repository
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
 
 # NodeJS
@@ -70,7 +70,7 @@ RUN set -ex \
     bison \
     libgdbm-dev \
     ruby \
-    autoconf bison build-essential libssl-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev \
+    autoconf bison build-essential libssl-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm-dev \
   ' \
   && apt-get install -y libtool libyaml-dev imagemagick \
   && apt-get install -y --no-install-recommends $buildDeps \
