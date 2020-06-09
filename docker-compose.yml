@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  timezone:
+    build: .
+    environment:
+      - TZ=America/New_York
+      - DEBIAN_FRONTEND=noninteractive
