@@ -114,7 +114,7 @@ RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
 # Path
 ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin
 
-RUN gem install fastlane -v ${FASTLANE_VERSION} -NW \
+RUN gem install fastlane -v ${FASTLANE_VERSION} \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
   && gem update --system
 RUN bundle install
