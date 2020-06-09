@@ -110,14 +110,20 @@ ENV BUNDLE_PATH="$GEM_HOME" \
 RUN mkdir -p "$GEM_HOME" "$BUNDLE_BIN" \
   && chmod 777 "$GEM_HOME" "$BUNDLE_BIN"
 
+ENV RUBY_PATH "/usr/local/lib/ruby/gems/$RUBY_VERSION/bin"
+
 
 # Path
-ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin
+ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin:$RUBY_PATH
 
 RUN gem install fastlane -v ${FASTLANE_VERSION} \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
-  && gem update --system \
-  && bundle init
+  && gem update --system
+RUN gem install bundler
+RUN gem install bundle
+
+ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
+
 
 # Remove Build Deps
 RUN apt-get purge -y --auto-remove $buildDeps
