@@ -120,8 +120,6 @@ RUN gem install fastlane -v ${FASTLANE_VERSION} \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
   && gem update --system
 RUN gem install bundler
-RUN gem install bundle
-RUN npx react-native
 
 ENV APKINFO_TOOLS /opt/apktools
 RUN mkdir ${APKINFO_TOOLS}
@@ -130,6 +128,7 @@ RUN cd /opt \
     && wget -q https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/3.5.0-5435860/aapt2-3.5.0-5435860-linux.jar -O aapt2.jar \
     && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
     && rm aapt2.jar
+RUN npm install -g react-native-cli
 
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 
@@ -138,4 +137,4 @@ ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 RUN apt-get purge -y --auto-remove $buildDeps
 
 # Output versions
-RUN node -v && npm -v && ruby -v && fastlane -v
+RUN node -v && npm -v && ruby -v && fastlane -v && react-native -v
