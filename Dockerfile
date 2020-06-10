@@ -121,6 +121,15 @@ RUN gem install fastlane -v ${FASTLANE_VERSION} \
   && gem update --system
 RUN gem install bundler
 RUN gem install bundle
+RUN npx react-native
+
+ENV APKINFO_TOOLS /opt/apktools
+RUN mkdir ${APKINFO_TOOLS}
+RUN wget -q https://github.com/google/bundletool/releases/download/0.10.3/bundletool-all-0.10.3.jar -O ${APKINFO_TOOLS}/bundletool.jar
+RUN cd /opt \
+    && wget -q https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/3.5.0-5435860/aapt2-3.5.0-5435860-linux.jar -O aapt2.jar \
+    && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
+    && rm aapt2.jar
 
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 
