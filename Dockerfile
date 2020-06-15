@@ -129,6 +129,7 @@ RUN cd /opt \
     && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
     && rm aapt2.jar
 RUN npm install -g react-native-cli
+RUN npm install -g firebase-tools
 
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 
