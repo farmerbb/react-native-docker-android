@@ -130,6 +130,7 @@ RUN cd /opt \
     && rm aapt2.jar
 RUN npm install -g react-native-cli
 RUN npm install -g firebase-tools
+RUN curl -sL firebase.tools | bash
 
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 
