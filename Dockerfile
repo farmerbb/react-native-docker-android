@@ -129,12 +129,8 @@ RUN cd /opt \
     && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
     && rm aapt2.jar
 RUN npm install -g react-native-cli
-
-#firebase-tools setup
-ADD https://github.com/firebase/firebase-tools/releases/download/v7.3.1/firebase-tools-linux firebase-tools-linux
-RUN chmod +x firebase-tools-linux
-RUN ./firebase-tools-linux --open-sesame appdistribution
-RUN curl -sL https://firebase.tools | bash
+RUN npm install -g firebase-tools
+RUN curl -sL firebase.tools | bash
 
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
 
