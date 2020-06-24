@@ -132,11 +132,12 @@ RUN npm install -g react-native-cli
 RUN npm install -g firebase-tools
 RUN curl -sL firebase.tools | bash
 
+ENV PATH $PATH:/usr/bin/firebase
 ENV PATH $PATH:/usr/local/bundle/gems/fastlane-$FASTLANE_VERSION/bin/fastlane
-
 
 # Remove Build Deps
 RUN apt-get purge -y --auto-remove $buildDeps
 
 # Output versions
 RUN node -v && npm -v && ruby -v && fastlane -v && react-native -v
+RUN which firebase
