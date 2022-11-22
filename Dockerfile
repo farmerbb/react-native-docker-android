@@ -1,4 +1,4 @@
-FROM gradle:6.0.1-jdk8
+FROM gradle:6.0.1-jdk11
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -8,12 +8,12 @@ ENV GRADLE_HOME /usr/local/gradle-6.0.1
 ENV ANDROID_SDK_URL http://dl.google.com/android/android-sdk_r24.3.5-linux.tgz
 ENV ANDROID_HOME /usr/local/android-sdk-linux
 ENV ANDROID_SDK_COMPONENTS_LATEST platform-tools,build-tools-28.0.3,android-28,extra-android-support,extra-android-m2repository,extra-google-m2repository
-ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
+ENV PATH ${PATH}:${ANDROID_HOME}/cmdline-tools/latest:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools
 
 # NodeJS
 ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_VERSION_NAME latest-dubnium
-ENV NODE_VERSION 10.x
+ENV NODE_VERSION 16.x
 
 #Ruby
 # https://www.ruby-lang.org/en/news/2020/03/31/ruby-2-7-1-released/
@@ -21,7 +21,7 @@ ENV RUBY_MAJOR 2.7
 ENV RUBY_VERSION 2.7.1
 ENV RUBY_DOWNLOAD_SHA256 b224f9844646cc92765df8288a46838511c1cec5b550d8874bd4686a904fcee7
 
-ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" \
+ENV SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip" \
     ANDROID_HOME="/usr/local/android-sdk" \
     ANDROID_VERSION=28 \
     ANDROID_BUILD_TOOLS_VERSION=28.0.3
@@ -36,11 +36,14 @@ RUN mkdir "$ANDROID_HOME" .android \
     && rm sdk.zip \
     && mkdir "$ANDROID_HOME/licenses" || true \
     && echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license" \
-    && yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+    && mv "$ANDROID_HOME/cmdline-tools" "$ANDROID_HOME/temp" \
+    && mkdir -p "$ANDROID_HOME/cmdline-tools" \
+    && mv "$ANDROID_HOME/temp" "$ANDROID_HOME/cmdline-tools/latest" \
+    && yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
 # Install Android Build Tool and Libraries
-RUN $ANDROID_HOME/tools/bin/sdkmanager --update > /dev/null
-RUN $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --update > /dev/null
+RUN $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "platforms;android-${ANDROID_VERSION}" \
     "platform-tools"  > /dev/null
 
@@ -114,7 +117,7 @@ ENV RUBY_PATH "/usr/local/lib/ruby/gems/$RUBY_VERSION/bin"
 
 
 # Path
-ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin:$RUBY_PATH
+ENV PATH $PATH:$BUNDLE_BIN:${ANDROID_HOME}/cmdline-tools/latest:$ANDROID_HOME/platform-tools:${GRADLE_HOME}/bin:$RUBY_PATH
 
 RUN gem install fastlane -v ${FASTLANE_VERSION} \
   && gem install fastlane-plugin-appicon fastlane-plugin-android_change_string_app_name fastlane-plugin-humanable_build_number \
@@ -124,10 +127,10 @@ RUN gem install bundler
 ENV APKINFO_TOOLS /opt/apktools
 RUN mkdir ${APKINFO_TOOLS}
 RUN wget -q https://github.com/google/bundletool/releases/download/0.10.3/bundletool-all-0.10.3.jar -O ${APKINFO_TOOLS}/bundletool.jar
-RUN cd /opt \
-    && wget -q https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/3.5.0-5435860/aapt2-3.5.0-5435860-linux.jar -O aapt2.jar \
-    && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
-    && rm aapt2.jar
+#RUN cd /opt \
+#    && wget -q https://dl.google.com/dl/android/maven2/com/android/cmdline-tools/latest/build/aapt2/3.5.0-5435860/aapt2-3.5.0-5435860-linux.jar -O aapt2.jar \
+#    && unzip -q aapt2.jar aapt2 -d ${APKINFO_TOOLS} \
+#    && rm aapt2.jar
 RUN npm install -g react-native-cli
 RUN npm install -g firebase-tools
 RUN curl -sL firebase.tools | bash
